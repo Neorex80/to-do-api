@@ -1,354 +1,139 @@
-# To-Do API
+<div align="center">
 
-A RESTful API built with Go for managing tasks (to-do items). This API provides full CRUD operations for tasks with SQLite storage and is designed for easy deployment on platforms like Render or Railway.
+# 🚀 To-Do API
 
-## Features
+![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white)
+![Railway](https://img.shields.io/badge/Railway-131415?style=for-the-badge&logo=railway&logoColor=white)
 
-- ✅ Full CRUD operations (Create, Read, Update, Delete)
-- ✅ SQLite database for data persistence
-- ✅ JSON request/response format
-- ✅ Input validation and error handling
-- ✅ CORS support for web clients
-- ✅ Health check endpoint
-- ✅ Graceful shutdown
-- ✅ Docker support
-- ✅ Environment variable configuration
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Neorex80/to-do-api?style=for-the-badge)](https://goreportcard.com/report/github.com/Neorex80/to-do-api)
+[![Docker Build](https://img.shields.io/badge/Docker-Build%20Ready-brightgreen?style=for-the-badge&logo=docker)](https://hub.docker.com/)
 
-## Tech Stack
+**🎯 A lightning-fast RESTful API built with Go for managing tasks**
 
-- **Language**: Go 1.21+
-- **Router**: Gorilla Mux
-- **Database**: SQLite
-- **Deployment**: Docker, Render, Railway
+[🚀 Quick Start](#-quick-start) • [📚 API Docs](#-api-endpoints) • [🐳 Docker](#-docker-deployment) • [☁️ Deploy](#️-deployment)
 
-## Quick Start
+</div>
 
-### Prerequisites
+---
 
-- Go 1.21 or higher
-- SQLite (for local development)
+## ✨ Features
 
-### Local Development
+🔥 **Full CRUD Operations** - Create, Read, Update, Delete tasks  
+💾 **SQLite Database** - Lightweight & persistent storage  
+🐳 **Docker Ready** - One-click containerized deployment  
+🌐 **CORS Enabled** - Ready for web frontend integration  
+⚡ **Health Monitoring** - Built-in health check endpoint  
+🛡️ **Error Handling** - Proper HTTP status codes & validation  
 
-1. Clone the repository:
+## 🚀 Quick Start
+
+### 🐳 Docker (Recommended)
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Neorex80/to-do-api.git
 cd to-do-api
-```
-
-2. Install dependencies:
-```bash
-go mod download
-```
-
-3. Run the application:
-```bash
-go run main.go
-```
-
-The server will start on `http://localhost:8080`
-
-### Using Docker
-
-1. **Quick Start with Docker Compose (Recommended):**
-```bash
 docker-compose up --build
 ```
 
-2. **Manual Docker Commands:**
+### 🔧 Local Development
 ```bash
-# Build the image
-docker build -t to-do-api .
-
-# Run the container with data persistence
-docker run -d --name to-do-api -p 8080:8080 -v $(pwd)/data:/app/data to-do-api
+go mod download
+go run main.go
 ```
 
-3. **For detailed Docker testing instructions, see [DOCKER_TESTING.md](DOCKER_TESTING.md)**
+**🌟 Server runs on:** `http://localhost:8080`
 
-## API Documentation
+## 📚 API Endpoints
 
-### Base URL
-- Local: `http://localhost:8080`
-- Production: `https://your-app.onrender.com` (or your deployment URL)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/health` | 💚 Health check |
+| `GET` | `/api/tasks` | 📋 Get all tasks |
+| `POST` | `/api/tasks` | ➕ Create task |
+| `GET` | `/api/tasks/{id}` | 🔍 Get specific task |
+| `PUT` | `/api/tasks/{id}` | ✏️ Update task |
+| `DELETE` | `/api/tasks/{id}` | 🗑️ Delete task |
 
-### Endpoints
-
-#### Health Check
-```
-GET /health
-```
-Returns the health status of the API.
-
-**Response:**
-```json
-{
-  "status": "healthy",
-  "service": "to-do-api"
-}
-```
-
-#### Get API Information
-```
-GET /
-```
-Returns basic API information and available endpoints.
-
-#### Create Task
-```
-POST /api/tasks
-```
-
-**Request Body:**
-```json
-{
-  "title": "Learn Go",
-  "description": "Complete Go tutorial and build an API",
-  "due_date": "2024-12-31T23:59:59Z",
-  "status": "pending"
-}
-```
-
-**Response:**
-```json
-{
-  "message": "Task created successfully",
-  "data": {
-    "id": 1,
-    "title": "Learn Go",
-    "description": "Complete Go tutorial and build an API",
-    "due_date": "2024-12-31T23:59:59Z",
-    "status": "pending",
-    "created_at": "2024-01-15T10:30:00Z",
-    "updated_at": "2024-01-15T10:30:00Z"
-  }
-}
-```
-
-#### Get All Tasks
-```
-GET /api/tasks
-```
-
-**Query Parameters:**
-- `status` (optional): Filter tasks by status (`pending`, `in_progress`, `completed`)
-
-**Example:**
-```
-GET /api/tasks?status=pending
-```
-
-**Response:**
-```json
-{
-  "message": "Tasks retrieved successfully",
-  "data": [
-    {
-      "id": 1,
-      "title": "Learn Go",
-      "description": "Complete Go tutorial and build an API",
-      "due_date": "2024-12-31T23:59:59Z",
-      "status": "pending",
-      "created_at": "2024-01-15T10:30:00Z",
-      "updated_at": "2024-01-15T10:30:00Z"
-    }
-  ]
-}
-```
-
-#### Get Single Task
-```
-GET /api/tasks/{id}
-```
-
-**Response:**
-```json
-{
-  "message": "Task retrieved successfully",
-  "data": {
-    "id": 1,
-    "title": "Learn Go",
-    "description": "Complete Go tutorial and build an API",
-    "due_date": "2024-12-31T23:59:59Z",
-    "status": "pending",
-    "created_at": "2024-01-15T10:30:00Z",
-    "updated_at": "2024-01-15T10:30:00Z"
-  }
-}
-```
-
-#### Update Task
-```
-PUT /api/tasks/{id}
-```
-
-**Request Body (partial updates allowed):**
-```json
-{
-  "status": "completed"
-}
-```
-
-**Response:**
-```json
-{
-  "message": "Task updated successfully",
-  "data": {
-    "id": 1,
-    "title": "Learn Go",
-    "description": "Complete Go tutorial and build an API",
-    "due_date": "2024-12-31T23:59:59Z",
-    "status": "completed",
-    "created_at": "2024-01-15T10:30:00Z",
-    "updated_at": "2024-01-15T12:45:00Z"
-  }
-}
-```
-
-#### Delete Task
-```
-DELETE /api/tasks/{id}
-```
-
-**Response:**
-```json
-{
-  "message": "Task deleted successfully"
-}
-```
-
-### Task Model
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| id | integer | auto | Unique identifier |
-| title | string | yes | Task title |
-| description | string | no | Task description |
-| due_date | datetime | no | Due date in ISO 8601 format |
-| status | string | no | Task status (default: "pending") |
-| created_at | datetime | auto | Creation timestamp |
-| updated_at | datetime | auto | Last update timestamp |
-
-### Status Values
-- `pending` - Task is not started
-- `in_progress` - Task is being worked on
-- `completed` - Task is finished
-
-## Error Handling
-
-The API returns standardized error responses:
-
-```json
-{
-  "error": "Validation failed",
-  "message": "title is required"
-}
-```
-
-### HTTP Status Codes
-- `200` - Success
-- `201` - Created
-- `400` - Bad Request (validation errors)
-- `404` - Not Found
-- `500` - Internal Server Error
-
-## Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| PORT | 8080 | Server port |
-| DB_PATH | ./tasks.db | SQLite database file path |
-
-## Deployment
-
-### Deploy to Render
-
-1. Create a new Web Service on [Render](https://render.com)
-2. Connect your GitHub repository
-3. Use the following settings:
-   - **Build Command**: `go build -o main .`
-   - **Start Command**: `./main`
-   - **Environment**: Go
-
-### Deploy to Railway
-
-1. Create a new project on [Railway](https://railway.app)
-2. Connect your GitHub repository
-3. Railway will automatically detect the Go application
-4. The service will be deployed using the Dockerfile
-
-### Environment Variables for Production
-
-Set these environment variables in your deployment platform:
-- `PORT`: Usually set automatically by the platform
-- `DB_PATH`: `/app/data/tasks.db` (or your preferred path)
-
-## Testing the API
-
-### Using curl
-
-Create a task:
+### 🧪 Quick Test
 ```bash
+# Health check
+curl http://localhost:8080/health
+
+# Create a task
 curl -X POST http://localhost:8080/api/tasks \
   -H "Content-Type: application/json" \
-  -d '{
-    "title": "Test Task",
-    "description": "This is a test task",
-    "status": "pending"
-  }'
-```
+  -d '{"title":"My Task","description":"Test task","status":"pending"}'
 
-Get all tasks:
-```bash
+# Get all tasks
 curl http://localhost:8080/api/tasks
 ```
 
-Update a task:
+## 🐳 Docker Deployment
+
 ```bash
-curl -X PUT http://localhost:8080/api/tasks/1 \
-  -H "Content-Type: application/json" \
-  -d '{"status": "completed"}'
+# Build & Run
+docker build -t to-do-api .
+docker run -p 8080:8080 to-do-api
+
+# With data persistence
+docker run -p 8080:8080 -v $(pwd)/data:/app/data to-do-api
 ```
 
-Delete a task:
-```bash
-curl -X DELETE http://localhost:8080/api/tasks/1
+## ☁️ Deployment
+
+### 🚄 Railway (One-Click Deploy)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/Neorex80/to-do-api)
+
+### 🎨 Render
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
+### 📦 Manual Steps
+1. **Push to GitHub** ✅
+2. **Connect to Railway/Render** 🔗
+3. **Auto-deploy with Docker** 🚀
+4. **Get live URL** 🌐
+
+## 🛠️ Tech Stack
+
+- **Backend:** Go 1.21+ with Gorilla Mux
+- **Database:** SQLite
+- **Containerization:** Docker
+- **Deployment:** Railway, Render, Heroku
+
+## 📄 Task Model
+
+```json
+{
+  "id": 1,
+  "title": "Learn Go",
+  "description": "Build awesome APIs",
+  "status": "pending",
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:30:00Z"
+}
 ```
 
-### Using a REST Client
+**Status Options:** `pending` | `in_progress` | `completed`
 
-You can also test the API using tools like:
-- [Postman](https://www.postman.com/)
-- [Insomnia](https://insomnia.rest/)
-- [Thunder Client](https://www.thunderclient.com/) (VS Code extension)
+## 🤝 Contributing
 
-## Project Structure
+1. 🍴 Fork the repo
+2. 🌿 Create feature branch
+3. 💻 Make changes
+4. 🚀 Submit PR
 
-```
-to-do-api/
-├── main.go                 # Entry point and server setup
-├── models/
-│   └── task.go            # Task model and repository
-├── handlers/
-│   └── task_handlers.go   # HTTP handlers
-├── database/
-│   └── db.go              # Database connection
-├── middleware/
-│   └── cors.go            # CORS middleware
-├── go.mod                 # Go module file
-├── go.sum                 # Go dependencies
-├── Dockerfile             # Docker configuration
-└── README.md              # This file
-```
+## 📜 License
 
-## Contributing
+MIT License - see [LICENSE](LICENSE) file for details.
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+---
 
-## License
+<div align="center">
 
-This project is licensed under the MIT License.
+**⭐ Star this repo if you found it helpful!**
+
+Made with ❤️ and Go
+
+</div>

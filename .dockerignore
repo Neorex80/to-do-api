@@ -1,0 +1,24 @@
+# Exclude test files from Docker build
+test_server.go
+test-docker.sh
+test-docker.ps1
+test-docker-simple.ps1
+
+# Exclude test data
+test-data/
+
+# Exclude documentation files
+*.md
+!README.md
+
+# Exclude git files
+.git
+.gitignore
+
+# Exclude IDE files
+.vscode/
+.idea/
+
+# Exclude temporary files
+*.tmp
+*.log

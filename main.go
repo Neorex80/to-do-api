@@ -34,6 +34,7 @@ func main() {
 	// Apply middleware
 	router.Use(middleware.CORS)
 	router.Use(middleware.Logging)
+	router.Use(middleware.Gzip)
 
 	// API routes
 	api := router.PathPrefix("/api").Subrouter()
@@ -48,25 +49,14 @@ func main() {
 	// Health check route
 	router.HandleFunc("/health", taskHandler.HealthCheck).Methods("GET")
 
-	// Root route for basic info
+	// Static file serving
+	staticFS := http.FileServer(http.Dir("./static"))
+	router.PathPrefix("/static/").Handler(middleware.WithCacheControl(http.StripPrefix("/static/", staticFS), "public, max-age=604800, immutable"))
+	
+	// Root route serves the frontend
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{
-			"service": "To-Do API",
-			"version": "1.0.0",
-			"endpoints": {
-				"health": "GET /health",
-				"tasks": {
-					"create": "POST /api/tasks",
-					"list": "GET /api/tasks",
-					"get": "GET /api/tasks/{id}",
-					"update": "PUT /api/tasks/{id}",
-					"delete": "DELETE /api/tasks/{id}"
-				}
-			},
-			"documentation": "https://github.com/your-username/to-do-api"
-		}`))
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		http.ServeFile(w, r, "./static/index.html")
 	}).Methods("GET")
 
 	// Get port from environment variable or use default
@@ -88,7 +78,7 @@ func main() {
 	go func() {
 		log.Printf("Server starting on port %s", port)
 		log.Printf("Health check: http://localhost:%s/health", port)
-		log.Printf("API documentation: http://localhost:%s/", port)
+		log.Printf("UI: http://localhost:%s/", port)
 		
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed to start: %v", err)

@@ -20,21 +20,17 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build the application with CGO enabled
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build \
-    -a -installsuffix cgo \
-    -ldflags '-extldflags "-static"' \
+# Build the application with CGO enabled and stripped binary
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -trimpath \
+    -ldflags '-s -w -extldflags "-static"' \
     -o main .
 
 # Final stage - use alpine for smaller image
 FROM alpine:latest
 
-# Install runtime dependencies
+# Install minimal runtime dependencies (wget only for HEALTHCHECK)
 RUN apk --no-cache add \
-    ca-certificates \
-    sqlite \
-    wget \
-    tzdata
+    wget
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S appgroup && \
@@ -55,7 +51,6 @@ USER appuser
 # Set environment variables
 ENV DB_PATH=/app/data/tasks.db
 ENV PORT=8080
-ENV GIN_MODE=release
 
 # Expose port
 EXPOSE 8080

@@ -59,23 +59,47 @@ func (h *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 
 // GetTasks handles GET /api/tasks
 func (h *TaskHandler) GetTasks(w http.ResponseWriter, r *http.Request) {
-	// Check for status filter
-	status := r.URL.Query().Get("status")
-	
-	var tasks []models.Task
-	var err error
-	
+	// Query params: status, limit, offset, sort_by, sort_order
+	q := r.URL.Query()
+	status := q.Get("status")
+	limit := 50
+	offset := 0
+	if v := q.Get("limit"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			if n < 1 {
+				limit = 1
+			} else if n > 100 {
+				limit = 100
+			} else {
+				limit = n
+			}
+		}
+	}
+	if v := q.Get("offset"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n >= 0 {
+			offset = n
+		}
+	}
+	sortBy := q.Get("sort_by")
+	if sortBy == "" {
+		sortBy = "created_at"
+	}
+	sortOrder := q.Get("sort_order")
+	if sortOrder == "" {
+		sortOrder = "desc"
+	}
+
+	var filterStatusPtr *string
 	if status != "" {
 		// Validate status
 		if !isValidStatus(status) {
 			h.sendErrorResponse(w, http.StatusBadRequest, "Invalid status", "Status must be one of: pending, in_progress, completed")
 			return
 		}
-		tasks, err = h.repo.GetByStatus(status)
-	} else {
-		tasks, err = h.repo.GetAll()
+		filterStatusPtr = &status
 	}
-	
+
+	tasks, err := h.repo.GetAllPaginated(filterStatusPtr, limit, offset, sortBy, sortOrder)
 	if err != nil {
 		log.Printf("Error fetching tasks: %v", err)
 		h.sendErrorResponse(w, http.StatusInternalServerError, "Failed to fetch tasks", "")

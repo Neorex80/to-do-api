@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -25,6 +26,27 @@ func InitDB() (*sql.DB, error) {
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
+
+	// Apply performance-oriented PRAGMAs and connection pool tuning
+	if _, err := db.Exec("PRAGMA journal_mode=WAL;"); err != nil {
+		return nil, err
+	}
+	if _, err := db.Exec("PRAGMA synchronous=NORMAL;"); err != nil {
+		return nil, err
+	}
+	if _, err := db.Exec("PRAGMA foreign_keys=ON;"); err != nil {
+		return nil, err
+	}
+	if _, err := db.Exec("PRAGMA temp_store=MEMORY;"); err != nil {
+		return nil, err
+	}
+	if _, err := db.Exec("PRAGMA busy_timeout=5000;"); err != nil {
+		return nil, err
+	}
+
+	db.SetMaxOpenConns(5)
+	db.SetMaxIdleConns(5)
+	db.SetConnMaxLifetime(1 * time.Hour)
 
 	// Create tables if they don't exist
 	if err := createTables(db); err != nil {

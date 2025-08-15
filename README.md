@@ -137,3 +137,41 @@ MIT License - see [LICENSE](LICENSE) file for details.
 Made with ❤️ and Go
 
 </div>
+
+# To-Do API
+
+A lightweight Go + SQLite to-do API with a minimal frontend.
+
+## Run locally
+
+```bash
+# build and run
+GO111MODULE=on go run ./...
+# open http://localhost:8080
+```
+
+## Docker
+
+```bash
+docker build -t todo-api .
+docker run --rm -p 8080:8080 -e DB_PATH=/app/data/tasks.db -v $(pwd)/.data:/app/data todo-api
+```
+
+## Endpoints
+- GET `/health`
+- GET `/api/tasks?status=&limit=&offset=&sort_by=&sort_order=`
+- GET `/api/tasks/{id}`
+- POST `/api/tasks`
+- PUT `/api/tasks/{id}`
+- DELETE `/api/tasks/{id}`
+
+## Frontend
+- Served at `/` with static assets under `/static/`
+- Links to GitHub and a Star button for quick access
+
+## Performance optimizations
+- SQLite PRAGMAs: WAL, synchronous=NORMAL, temp_store=MEMORY, busy_timeout
+- Connection pool tuned (max open/idle, conn lifetime)
+- Pagination and server-side filtering for task list
+- Gzip compression and cache-control for static assets
+- Docker image slimmed via `-trimpath`, `-s -w` and minimal runtime

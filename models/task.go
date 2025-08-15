@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"strings"
 	"time"
 )
 
@@ -66,6 +67,7 @@ type TaskRepository interface {
 	Update(id int, task *TaskRequest) (*Task, error)
 	Delete(id int) error
 	GetByStatus(status string) ([]Task, error)
+	GetAllPaginated(filterStatus *string, limit int, offset int, sortBy string, sortOrder string) ([]Task, error)
 }
 
 // SQLiteTaskRepository implements TaskRepository for SQLite
@@ -129,6 +131,51 @@ func (r *SQLiteTaskRepository) GetAll() ([]Task, error) {
 		tasks = append(tasks, task)
 	}
 	
+	return tasks, nil
+}
+
+// GetAllPaginated retrieves tasks with optional filtering, sorting, and pagination
+func (r *SQLiteTaskRepository) GetAllPaginated(filterStatus *string, limit int, offset int, sortBy string, sortOrder string) ([]Task, error) {
+	allowedSort := map[string]bool{
+		"created_at": true,
+		"updated_at": true,
+		"due_date":   true,
+		"id":         true,
+	}
+	if !allowedSort[sortBy] {
+		sortBy = "created_at"
+	}
+	sortOrder = strings.ToUpper(sortOrder)
+	if sortOrder != "ASC" && sortOrder != "DESC" {
+		sortOrder = "DESC"
+	}
+
+	base := `
+		SELECT id, title, description, due_date, status, created_at, updated_at
+		FROM tasks
+	`
+	args := make([]interface{}, 0, 3)
+	if filterStatus != nil && *filterStatus != "" {
+		base += " WHERE status = ?"
+		args = append(args, *filterStatus)
+	}
+	base += " ORDER BY " + sortBy + " " + sortOrder + " LIMIT ? OFFSET ?"
+	args = append(args, limit, offset)
+
+	rows, err := r.db.Query(base, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tasks []Task
+	for rows.Next() {
+		var task Task
+		if err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.DueDate, &task.Status, &task.CreatedAt, &task.UpdatedAt); err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, task)
+	}
 	return tasks, nil
 }
 

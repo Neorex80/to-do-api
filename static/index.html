@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>To-Do API UI</title>
+	<link rel="preload" href="/static/styles.css" as="style">
+	<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+	<header class="app-header">
+		<h1>To-Do API</h1>
+		<nav>
+			<a class="gh-link" href="https://github.com/your-username/to-do-api" target="_blank" rel="noopener">GitHub</a>
+			<a class="star-btn" href="https://github.com/your-username/to-do-api/stargazers" target="_blank" rel="noopener">⭐ Star</a>
+		</nav>
+	</header>
+
+	<main class="container">
+		<section class="create">
+			<h2>Create Task</h2>
+			<form id="create-form">
+				<div class="row">
+					<label>Title <input type="text" id="title" required maxlength="120"></label>
+				</div>
+				<div class="row">
+					<label>Description <textarea id="description" rows="3" maxlength="500"></textarea></label>
+				</div>
+				<div class="row two">
+					<label>Due <input type="date" id="due"></label>
+					<label>Status
+						<select id="status">
+							<option value="pending" selected>pending</option>
+							<option value="in_progress">in_progress</option>
+							<option value="completed">completed</option>
+						</select>
+					</label>
+				</div>
+				<button type="submit">Add</button>
+			</form>
+		</section>
+
+		<section class="list">
+			<h2>Tasks</h2>
+			<div class="filters">
+				<label>Status
+					<select id="filter-status">
+						<option value="">all</option>
+						<option value="pending">pending</option>
+						<option value="in_progress">in_progress</option>
+						<option value="completed">completed</option>
+					</select>
+				</label>
+			</div>
+			<ul id="tasks" class="tasks"></ul>
+			<div class="pagination">
+				<button id="prev" disabled>Prev</button>
+				<span id="page-info"></span>
+				<button id="next">Next</button>
+			</div>
+		</section>
+	</main>
+
+	<footer class="footer">
+		<span>Built for speed — minimal JS, gzip on, cached assets.</span>
+	</footer>
+
+	<script defer src="/static/app.js"></script>
+</body>
+</html>
